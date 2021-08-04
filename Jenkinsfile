@@ -1,51 +1,34 @@
+node{
+    
+   def mavenHome = tool name: "maven 3.6.3"
+    
+    stage('CheckoutCode'){
+        git branch: 'development', credentialsId: '33d27d4e-05d8-4e0c-bf08-93bac6f0a46f', url: 'https://github.com/Naveenkumar829/https-github.com-MithunTechnologiesDevOps-maven-web-application.git'
+    }
+    stage('Build'){
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+    stage('ExecuteSonarQubeReport'){
+        sh "${mavenHome}/bin/mvn sonar:sonar"
+    }
+    stage('ExecuteSonaTypeNexusReport'){
+        sh "${mavenHome}/bin/mvn deploy"
+    
+    }
+    
+    stage('Tomcat'){
 
-node('node1')
+        sshagent(['a2e35600-df75-4f9a-969e-b9c0afbcb577']) {
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.126.242.200:/opt/tomcat9/webapps/"
+}
+    }
 
-node
-
-{
-
-  def mavenHome=tool name: "maven3.6.3"
-  
- stage('Checkout')
- {
- 	git branch: 'development', credentialsId: 'bed5a851-d84d-412e-87e7-bf9ce23c0e0e', url: 'https://github.com/MithunTechnologiesDevOps/maven-web-application.git'
- 
- }
-
- 
-
-
- /*
- stage('Build')
- {
- sh  "${mavenHome}/bin/mvn clean package"
- }
- 
- stage('ExecuteSoanrQubeReport')
- {
- sh  "${mavenHome}/bin/mvn sonar:sonar"
- }
- 
- stage('UploadArtifactintoNexus')
- {
- sh  "${mavenHome}/bin/mvn deploy"
- }
- 
- stage('DeployAppintoTomcat')
- {
- sshagent(['cd93d61f-2d0f-4c60-8b33-34cf4fa888b0']) {
-  sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.235.132.183:/opt/apache-tomcat-9.0.29/webapps/"
- }
- }
-*/
- stage('SendEmailNotification')
- {
- emailext body: '''Build is over..
-
- Regards,
- Mithun Technologies,
- 9980923226.''', subject: 'Build is over', to: 'devopstrainingblr@gmail.com'
- }
-
+    stage('jacaco'){
+        jacoco deltaBranchCoverage: '80', deltaInstructionCoverage: '80', maximumBranchCoverage: '80', maximumComplexityCoverage: '80', maximumInstructionCoverage: '80', minimumBranchCoverage: '80', minimumInstructionCoverage: '80'
+    }
+    
+    stage('email'){
+        mail bcc: '', body: 'jenkins automation build is completed. please validate and let us know in case of any concerns.', cc: 'venkatanaveenkumar.namburi@gmail.com', from: '', replyTo: '', subject: 'Jenkins Automation build', to: 'nvnaveenkumar0@gmail.com'
+    }
+    
 }
