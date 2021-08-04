@@ -26,9 +26,9 @@ node{
     stage('jacaco'){
         jacoco deltaBranchCoverage: '80', deltaInstructionCoverage: '80', maximumBranchCoverage: '80', maximumComplexityCoverage: '80', maximumInstructionCoverage: '80', minimumBranchCoverage: '80', minimumInstructionCoverage: '80'
     }
-    
+    /*
     stage('email'){
         mail bcc: '', body: 'jenkins automation build is completed. please validate and let us know in case of any concerns.', cc: 'venkatanaveenkumar.namburi@gmail.com', from: '', replyTo: '', subject: 'Jenkins Automation build', to: 'nvnaveenkumar0@gmail.com'
-    }
+    } */
     
 }
